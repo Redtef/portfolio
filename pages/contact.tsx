@@ -1,15 +1,11 @@
 import { Header } from '@/components/Form';
 import { PageSEO } from '@/components/SEO';
-import SocialIcons from '@/components/SocialIcons';
+
 import siteMetadata from '@/data/siteMetadata';
-import { useRandomColorPair } from '@/lib/hooks/useRandomColorPair';
 import { contact } from 'config/contact';
 import { openPopupWidget } from 'react-calendly';
-import { RoughNotation } from 'react-rough-notation';
 
 function Contact(): React.ReactElement {
-  const [randomColor] = useRandomColorPair();
-
   function onScheduleMeeting(): void {
     if (!contact.calendly) {
       console.error('err: calendly link was not provided.');

@@ -5,7 +5,7 @@ avatar: /static/avatar.jpg
 occupation: FullStack Software Engineer
 company: Hygiene Expert
 # resume: https://firebasestorage.googleapis.com/v0/b/portfolio-8fa71.appspot.com/o/Karan_Resume.pdf?alt=media&token=b4838b9e-812a-456a-89cc-bb19b4ecb923
-resume: #
+resume: https://drive.google.com/file/d/1F23K7nK8WqFv2t1qoNm89K9AlxyEi_-q/view?usp=sharing
 email: hamzatakouit@gmail.com
 twitter: https://twitter.com/HamzaT44
 linkedin: https://www.linkedin.com/in/hamzatakouit
