@@ -3,22 +3,8 @@ import { PageSEO } from '@/components/SEO';
 
 import siteMetadata from '@/data/siteMetadata';
 import { contact } from 'config/contact';
-import { openPopupWidget } from 'react-calendly';
 
 function Contact(): React.ReactElement {
-  function onScheduleMeeting(): void {
-    if (!contact.calendly) {
-      console.error('err: calendly link was not provided.');
-      return;
-    }
-
-    const config = {
-      url: contact.calendly,
-    };
-
-    openPopupWidget(config);
-  }
-
   return (
     <>
       <PageSEO
@@ -33,7 +19,7 @@ function Contact(): React.ReactElement {
             chat? Feel free to
             <span
               className='ml-2 cursor-pointer !font-normal !text-black !no-underline dark:!text-white'
-              onClick={onScheduleMeeting}
+              // onClick={onScheduleMeeting}
               role='button'
               tabIndex={0}
             >

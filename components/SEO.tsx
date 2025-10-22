@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import siteMetadata from '@/data/siteMetadata';
 import { AuthorFrontMatter } from 'types/AuthorFrontMatter';
 import { PostFrontMatter } from 'types/PostFrontMatter';
+import Script from 'next/script';
 
 interface CommonSEOProps {
   title: string;
@@ -200,7 +201,8 @@ export const BlogSEO = ({
         {lastmod && (
           <meta property='article:modified_time' content={modifiedAt} />
         )}
-        <script
+        <Script
+          strategy='afterInteractive'
           type='application/ld+json'
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(structuredData, null, 2),
