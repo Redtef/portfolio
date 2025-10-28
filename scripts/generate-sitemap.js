@@ -1,5 +1,7 @@
 const fs = require('fs');
-const globby = require('globby');
+// `globby` v15 is ESM and exposes named exports. When required from
+// CommonJS, use the named `globby` export.
+const { globby } = require('globby');
 const matter = require('gray-matter');
 const prettier = require('prettier');
 const siteMetadata = require('../data/siteMetadata');
@@ -59,9 +61,17 @@ const siteMetadata = require('../data/siteMetadata');
         </urlset>
     `;
 
-  const formatted = prettier.format(sitemap, {
+  // Prettier's API is synchronous in most versions, but to be defensive
+  // across versions/plugins, accept a Promise or string result.
+  const formattedOrPromise = prettier.format(sitemap, {
     ...prettierConfig,
     parser: 'html',
   });
+
+  const formatted =
+    formattedOrPromise && typeof formattedOrPromise.then === 'function'
+      ? await formattedOrPromise
+      : formattedOrPromise;
+
   fs.writeFileSync('public/sitemap.xml', formatted);
 })();

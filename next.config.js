@@ -6,7 +6,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app www.googletagmanager.com www.google-analytics.com;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app www.googletagmanager.com www.google-analytics.com blob:;
   style-src 'self' 'unsafe-inline';
   img-src * blob: data:;
   media-src 'none';
@@ -54,8 +54,20 @@ const nextConfig = withBundleAnalyzer({
     // But if you were enabling any other experimental features you can specify them here.
   },
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  eslint: {
-    dirs: ['pages', 'components', 'lib', 'layouts', 'scripts', 'config'],
+  // `eslint` config key removed — Next 16 no longer supports specifying
+  // eslint dirs in `next.config.js`. Use a root `.eslintrc` or run
+  // eslint separately.
+
+  // Add an empty turbopack config to allow projects with custom webpack
+  // functions to continue building while keeping Turbopack enabled by
+  // default in Next 16+. For a full migration, consider moving to a
+  // Turbopack-compatible config or passing the `--webpack` flag.
+  turbopack: {
+    // Explicitly set the Turbopack root to this project directory.
+    // Next inferred the workspace root incorrectly (see build warning). Setting
+    // this fixes module resolution and ensures PostCSS/Tailwind run against
+    // the correct project root.
+    root: __dirname,
   },
   images: {
     remotePatterns: [
