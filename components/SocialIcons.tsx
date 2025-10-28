@@ -62,6 +62,7 @@ function resolveIcon(entry: Tuple<string>): React.ReactNode {
 
   return (
     <a
+      key={type}
       className='social-icons'
       href={url}
       aria-label={type}

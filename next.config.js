@@ -1,68 +1,83 @@
+// next.config.js
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
+  // you can add other options here such as openAnalyzer: false
 });
 
-// You might need to insert additional domains in script-src if you are using external services
 const ContentSecurityPolicy = `
   default-src 'self';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app www.googletagmanager.com www.google-analytics.com;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' giscus.app www.googletagmanager.com www.google-analytics.com blob:;
   style-src 'self' 'unsafe-inline';
   img-src * blob: data:;
   media-src 'none';
   connect-src *;
   font-src 'self';
-  frame-src giscus.app www.youtube.com calendly.com
+  frame-src giscus.app www.youtube.com calendly.com;
 `;
 
 const securityHeaders = [
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
   {
     key: 'Content-Security-Policy',
     value: ContentSecurityPolicy.replace(/\n/g, ''),
   },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
   {
     key: 'Referrer-Policy',
     value: 'strict-origin-when-cross-origin',
   },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
   {
     key: 'X-Frame-Options',
     value: 'DENY',
   },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
   {
     key: 'X-Content-Type-Options',
     value: 'nosniff',
   },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
   {
     key: 'X-DNS-Prefetch-Control',
     value: 'on',
   },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
   {
     key: 'Strict-Transport-Security',
     value: 'max-age=31536000; includeSubDomains',
   },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy
   {
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
   },
 ];
 
-/**
- * @type {import('next/dist/next-server/server/config').NextConfig}
- **/
-module.exports = withBundleAnalyzer({
+/** @type {import('next').NextConfig} */
+const nextConfig = withBundleAnalyzer({
   reactStrictMode: true,
+  experimental: {
+    // Since Next.js 14 stable includes Server Actions, you typically don’t need experimental.serverActions = true.  [oai_citation:0‡Next.js](https://nextjs.org/docs/app/api-reference/config/next-config-js/serverActions?utm_source=chatgpt.com)
+    // But if you were enabling any other experimental features you can specify them here.
+  },
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
-  eslint: {
-    dirs: ['pages', 'components', 'lib', 'layouts', 'scripts', 'config'],
+  // `eslint` config key removed — Next 16 no longer supports specifying
+  // eslint dirs in `next.config.js`. Use a root `.eslintrc` or run
+  // eslint separately.
+
+  // Add an empty turbopack config to allow projects with custom webpack
+  // functions to continue building while keeping Turbopack enabled by
+  // default in Next 16+. For a full migration, consider moving to a
+  // Turbopack-compatible config or passing the `--webpack` flag.
+  turbopack: {
+    // Explicitly set the Turbopack root to this project directory.
+    // Next inferred the workspace root incorrectly (see build warning). Setting
+    // this fixes module resolution and ensures PostCSS/Tailwind run against
+    // the correct project root.
+    root: __dirname,
   },
   images: {
-    domains: ['firebasestorage.googleapis.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   async headers() {
     return [
@@ -72,18 +87,13 @@ module.exports = withBundleAnalyzer({
       },
     ];
   },
-  webpack: (config, { dev, isServer }) => {
+  webpack(config, { dev, isServer }) {
     config.module.rules.push({
       test: /\.(png|jpe?g|gif|mp4)$/i,
-      use: [
-        {
-          loader: 'file-loader',
-          options: {
-            publicPath: '/_next',
-            name: 'static/media/[name].[hash].[ext]',
-          },
-        },
-      ],
+      type: 'asset/resource',
+      generator: {
+        filename: 'static/media/[name].[hash][ext]',
+      },
     });
 
     config.module.rules.push({
@@ -92,7 +102,7 @@ module.exports = withBundleAnalyzer({
     });
 
     if (!dev && !isServer) {
-      // Replace React with Preact only in client production build
+      // Replace React with Preact only in client-production build
       Object.assign(config.resolve.alias, {
         'react/jsx-runtime.js': 'preact/compat/jsx-runtime',
         react: 'preact/compat',
@@ -103,4 +113,7 @@ module.exports = withBundleAnalyzer({
 
     return config;
   },
+  // You can also add other Next.js config options here (rewrites, redirects, i18n, basePath, etc.)
 });
+
+module.exports = nextConfig;
